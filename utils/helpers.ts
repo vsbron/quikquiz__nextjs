@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   MULTIPLIER_CASUAL,
   MULTIPLIER_MODERATE,
@@ -26,3 +27,20 @@ export function getMultiplier(difficulty: Difficulty) {
   // Return the correct multiplier
   return multiplierByDifficulty[difficulty];
 }
+
+// Helper function (cached) that fetched the category
+export const getCategoryData = cache(async (category: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_DOMAIN}/api/categories/${category}`,
+    { cache: "no-store" },
+  );
+
+  // Guard clause
+  if (!res.ok) return null;
+
+  // Convert response to categories
+  const categories = (await res.json()) as QuestionsPack;
+
+  // Return question pack
+  return categories;
+});

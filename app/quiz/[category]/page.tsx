@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import QuizSection from "@/components/QuizSection";
 import { APP_NAME, LINKS } from "@/utils/constants";
+import { getCategoryData } from "@/utils/helpers";
 
 // Props interface
 interface QuestionsPageProps {
@@ -13,18 +14,12 @@ interface QuestionsPageProps {
 export async function generateMetadata({
   params,
 }: QuestionsPageProps): Promise<Metadata> {
-  // Get the params and fetch the data
+  // Get the params, fetch the data and get the category's questions
   const { category } = await params;
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/categories/${category}`,
-    { cache: "no-store" },
-  );
+  const questionsPack = await getCategoryData(category);
 
   // Guard clause
-  if (!res.ok) notFound();
-
-  // Get the actual data and destructure it
-  const questionsPack = (await res.json()) as QuestionsPack;
+  if (!questionsPack) notFound();
 
   // Returned Metadata
   return {
@@ -60,18 +55,12 @@ export async function generateMetadata({
 
 // The component
 async function QuestionsPage({ params }: QuestionsPageProps) {
-  // Get the params and fetch the data
+  // Get the params, fetch the data and get the category's questions
   const { category } = await params;
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/categories/${category}`,
-    { cache: "no-store" },
-  );
+  const questionsPack = await getCategoryData(category);
 
   // Guard clause
-  if (!res.ok) notFound();
-
-  // Get the actual data and destructure it
-  const questionsPack = (await res.json()) as QuestionsPack;
+  if (!questionsPack) notFound();
 
   // Returned JSX
   return <QuizSection questions={questionsPack} />;
